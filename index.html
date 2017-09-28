@@ -116,6 +116,30 @@
     
     
         <article class="index-post">
+            <a class="content-show-full" href = "/2017/09/28/drawRect-内存暴增原因，如何优化绘图/" >
+                    <h2 class="abstract-title">
+                        
+                        <span>drawRect 内存暴增原因，如何优化绘图</span>
+                    </h2>
+                <div class="abstract-content">
+                    前言
+最近有朋友问，直接用UILabel和自己用drawRect画UILabel，哪个性能好？为什么？哪个占用的内存少？为什么?
+其实这种问题的本质就是使用drawRect会带来哪些问题，性能上当然是UILabel好了。drawRect每当我们需要绘图的时候，重写UIView的drawRect方法，在此方法中进行绘图操作，然后苹果要求我们调用UIView类中的setNeedsDisplay方法，系统就会自动调用drawRect。UIView继承于UIResponder，需要实现CALayerDelegate。此处我们不得不提出UIView和CALayer，每一个UIView 内部都有一个...
+                </div>
+            </a>
+            <div class="abstract-post-meta">
+                <!-- tags  -->
+                
+                <!-- date  -->
+                <div class="abstract-date">
+                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/09/28</span>
+                </div>
+            </div>
+        </article>
+    
+    
+    
+        <article class="index-post">
             <a class="content-show-full" href = "/2017/09/19/the-first-blog/" >
                     <h2 class="abstract-title">
                         
@@ -245,7 +269,14 @@
     
     
     
-    <div class="total-archive"> Total : 1 </div>
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-archive"> Total : 2 </div>
     
     <div class="post-archive">
     
@@ -254,6 +285,11 @@
     
     <div class="archive-year"> 2017 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/28</span><a class="archive-post-title" href= "/2017/09/28/drawRect-内存暴增原因，如何优化绘图/" >drawRect 内存暴增原因，如何优化绘图</a>
+        </li>
     
     
         <li class="archive-post-item">

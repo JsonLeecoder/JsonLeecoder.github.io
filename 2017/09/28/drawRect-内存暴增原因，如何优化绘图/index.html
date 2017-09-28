@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
     <title>
         
-        JasonLee&#39;s Blog
+        drawRect 内存暴增原因，如何优化绘图 · JasonLee&#39;s Blog
         
     </title>
     <link rel="icon" href= /assests/favicon.ico>
@@ -68,11 +68,22 @@
     
 </head>
     
+        <body class="post-body">
+    
     
 <header class="header">
 
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/" >JasonLee&#39;s Blog</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">drawRect 内存暴增原因，如何优化绘图</a>
+            </div>
+    </div>
     
     <a class="home-link" href=/>JasonLee's Blog</a>
 </header>
@@ -80,75 +91,75 @@
         <div class="site-intro">
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(http://oumn0o088.bkt.clouddn.com/post-bg.jpg)"></div>
     <div class="site-intro-placeholder"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
             
+            drawRect 内存暴增原因，如何优化绘图
+            <!-- 404 -->
+            
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+        </p>
+        <!-- 404 -->
+        
         <!-- 文章页meta -->
+        
+            <!-- 文章页标签  -->
+            
+            <div class="post-intro-meta">
+                <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                <span class="post-intro-time">2017/09/28</span>
+            </div>
         
     </div>
 </div>
         <div class="container">
-            <main class="main index-page">
-    
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/09/28/drawRect-内存暴增原因，如何优化绘图/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>drawRect 内存暴增原因，如何优化绘图</span>
-                    </h2>
-                <div class="abstract-content">
-                    前言
-最近有朋友问，直接用UILabel和自己用drawRect画UILabel，哪个性能好？为什么？哪个占用的内存少？为什么?
-其实这种问题的本质就是使用drawRect会带来哪些问题，性能上当然是UILabel好了。drawRect每当我们需要绘图的时候，重写UIView的drawRect方法，在此方法中进行绘图操作，然后苹果要求我们调用UIView类中的setNeedsDisplay方法，系统就会自动调用drawRect。UIView继承于UIResponder，需要实现CALayerDelegate。此处我们不得不提出UIView和CALayer，每一个UIView 内部都有一个...
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/09/28</span>
-                </div>
-            </div>
-        </article>
-    
-    
-    
-        <article class="index-post">
-            <a class="content-show-full" href = "/2017/09/19/the-first-blog/" >
-                    <h2 class="abstract-title">
-                        
-                        <span>the first blog</span>
-                    </h2>
-                <div class="abstract-content">
-                    你好，欢迎来到JasonLee的技术博客！
+            <main class="main post-page">
+    <article class="article-entry">
+        <p>前言</p>
+<p>最近有朋友问，直接用UILabel和自己用drawRect画UILabel，哪个性能好？为什么？哪个占用的内存少？为什么?</p>
+<p>其实这种问题的本质就是使用drawRect会带来哪些问题，性能上当然是UILabel好了。<br>drawRect<br>每当我们需要绘图的时候，重写UIView的drawRect方法，在此方法中进行绘图操作，然后苹果要求我们调用UIView类中的setNeedsDisplay方法，系统就会自动调用drawRect。<br>UIView继承于UIResponder，需要实现CALayerDelegate。此处我们不得不提出UIView和CALayer，每一个UIView 内部都有一个CALayer，UIView 的frame 直接返回的是layer的frame，在内容的绘制上其实是CALayer 操作的，所以绘图的关键还是在CALayer 上。那么CALayer 是如何显示在屏幕上的呢？</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1024523-a61f42f54c776af6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>contents：对象提供的内容层,通常是CGImageRef,但也可能是其他。（Mac OS X 10.6及以后支持NSImage对象）默认值是零。<br>CGImageRef，它是一个指向CGImage结构的指针。UIImage有一个CGImage属性，它返回一个”CGImageRef”,如果你想把这个值直接赋值给CALayer的contents，那你将会得到一个编译错误。因为CGImageRef并不是一个真正的Cocoa对象，而是一个Core Foundation类型。 尽管Core Foundation类型跟Cocoa对象在运行时貌似很像（被称作toll-free bridging），他们并不是类型兼容的，不过你可以通过bridged关键字转换。<br>所以要为CALayer图层设置寄宿图片属性的最终代码：<br>layer.contents = (__bridge id)image.CGImage;</p>
+<p>除了赋值之外，我们的绘图操作即是对contents（寄宿图）绘制。<br>所以，回到问题，直接用UILabel和自己用drawRect画UILabel，哪个性能好？<br>直接用UILabel，drawRect 方法没有默认实现，所以说，寄宿图也就不需要了。<br>用drawRect绘图，默认实现CALayerDelegate协议</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1024523-82c13c4d85827f66.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
+<p>displayLayer:(CALayer <em>)layer; 可以通过此方法直接设置contents<br>drawLayer:(CALayer </em>)layer inContext:(CGContextRef)ctx;<br>在此方法调用之前，CALayer需要创建一个空寄宿图（有尺寸）和一个Core<br>Graphics 的CGContextRef（上下文），当绘制结束后，Core Animation打包所有图层和动画属性，然后通过IPC（内部处理通信）发送到渲染服务器进行显示，同时上下文会被不断渲染到屏幕上，直到下次调用setNeedsDisplay。<br>所以每次重绘都需要抹掉内存重新分配，空寄宿图的产生就消耗了大量内存，这也就是drawRect 内存暴增原因。</p>
+<p>那么我们如果必须使用drawRect，如何优化绘图呢？<br>Core Graphics框架 有强大的api，但是UIBezierPath 对paths进一步封装，使用更加简单，同时我们使用CAShapeLayer 才会使UIBezierPath发挥出更大的作用。<br>CAShapeLayer继承自CALayer，可以使用CALayer的所有属性值。</p>
+<p>CAShapeLayer属于CoreAnimation框架，其动画渲染直接提交到手机的GPU当中，相较于view的drawRect方法使用CPU渲染而言（实现drawRect消耗性能跟CoreGraphics 这个框架是基于CPU没有关系），GPU图像处理工作更多在硬件层面，效率极高；</p>
+<p>一个 CAShapeLayer 不需要像普通 CALayer 一样创建一个寄宿图形，所以无论有多大，都不会占用太多的内存。</p>
+<p>所以，以后关于绘图，我们可以尝试使用CAShapeLayer + UIBezierPath。</p>
+<p>参考：<br><a href="http://blog.csdn.net/jijiji000111/article/details/50480405" target="_blank" rel="external">内存恶鬼drawRect - 谈画图功能的内存优化</a><br>本文查阅多方资料整理，有误地方请指出，谢谢！</p>
 
-                </div>
-            </a>
-            <div class="abstract-post-meta">
-                <!-- tags  -->
-                
-                <!-- date  -->
-                <div class="abstract-date">
-                    <span class="abstract-calander iconfont-archer"></span><span class="abstract-time">2017/09/19</span>
-                </div>
-            </div>
-        </article>
+    </article>
+    <!-- 前后页  -->
+    <ul class="post-pager">
+        
+        
+            <li class="previous">
+                <a href= "/2017/09/19/the-first-blog/" title= the first blog >
+                    <span>Previous Post</span>
+                    <span>the first blog</span>
+                </a>
+            </li>
+        
+    </ul>
+    <!-- 来必力City版安装代码 -->
+
     
-    <!-- paginator  -->
-    
+
+<!-- City版安装代码已完成 -->
 </main>
             <!-- profile -->
             
